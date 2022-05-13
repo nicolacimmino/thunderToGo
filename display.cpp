@@ -1,7 +1,9 @@
 #include "display.h"
 
-Display::Display()
+Display::Display(Thunderstorm *thunderstorm)
 {
+    this->thunderstorm = thunderstorm;
+
     this->oled = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
     this->oled->begin(SSD1306_SWITCHCAPVCC, DISPLAY_I2C_ADDRESS);
@@ -42,27 +44,29 @@ void Display::reportStatus()
     char message[160];
 
     //if (!thunderstormActive)
-    if(1)
-    {
-        strcpy(message, "        Thunder  \n"
-                        "                   \n"
-                        "STK: ---            \n"
-                        "DST: ---            \n"
-                        "ENE: ---            \n"
-                        "TMS: ---            \n"
-                        "                   \n");
-    }
-    else
-    {
-        // sprintf(message, "        Thunder  \n"
-        //                  "                   \n"
-        //                  "STK: %d            \n"
-        //                  "DST: %d            \n"
-        //                  "ENE: %d            \n"
-        //                  "TMS: %d            \n"
-        //                  "                   \n",
-        //         strikes, distance, energy, timeSinceLastStrikeMinutes);
-    }
+    // if (1)
+    // {
+    //     strcpy(message, "        Thunder  \n"
+    //                     "                   \n"
+    //                     "STK: ---            \n"
+    //                     "DST: ---            \n"
+    //                     "ENE: ---            \n"
+    //                     "TMS: ---            \n"
+    //                     "                   \n");
+    // }
+    // else
+    // {
+
+    uint16_t timeInMinutes = (this->thunderstorm->lastStrikeTime - millis()) / 60000;
+
+    sprintf(message, "        Thunder  \n"
+                     "                   \n"
+                     "STK: %d            \n"
+                     "DST: %d            \n"
+                     "ENE: %d            \n"
+                     "TMS: %d            \n"
+                     "INT: %d            \n",
+            this->thunderstorm->strikes, this->thunderstorm->distance, this->thunderstorm->energy, 0, this->thunderstorm->interferers);
 
     static uint16_t lastPoorCrc = 0;
 

@@ -3,6 +3,7 @@
 #define __DISPLAY_H__
 
 #include <Adafruit_SSD1306.h>
+#include "thunderstorm.h"
 
 #define OLED_RESET -1
 #define SCREEN_WIDTH 128
@@ -14,13 +15,14 @@
 class Display
 {
 private:
+    Thunderstorm *thunderstorm;
     bool awake = true;
     unsigned long idleSince = 0;
     Adafruit_SSD1306 *oled;
     void reportStatus();
 
 public:
-    Display();
+    Display(Thunderstorm *thunderstorm);
     void loop();
     void keepAwake();
 };
