@@ -21,13 +21,15 @@
 
 #define LEDS_COUNT 1
 #define PIN_BUTTON 7
-#define PIN_THUNDER_IRQ 1
+#define PIN_THUNDER_IRQ 0
 
 #include "display.h"
 #include "thunderstorm.h"
 
 Display *display;
 Thunderstorm *thunderstorm;
+
+bool showOngoing = false;
 
 CRGB led[LEDS_COUNT];
 
@@ -50,7 +52,6 @@ void setup()
 
     thunderstorm = new Thunderstorm();
     display = new Display(thunderstorm);
-    
 
     FastLED.addLeds<WS2812B, 5, GRB>(led, LEDS_COUNT);
     FastLED.setBrightness(255);
@@ -75,10 +76,10 @@ void setup()
 
 ISR(WDT_vect)
 {
-    // if (showOngoing)
-    // {
-    //     return;
-    // }
+    if (showOngoing)
+    {
+        return;
+    }
 
     uint8_t timeSinceLastStrikeMinutes = floor(((millis() - thunderstorm->lastStrikeTime) / 60000));
 
@@ -113,45 +114,41 @@ ISR(WDT_vect)
     FastLED.show();
 }
 
-// void lightningShow()
-// {
-//     showOngoing = true;
-
-//     byte previousBrightness = FastLED.getBrightness();
-
-//     for (int ix = 0; ix < LEDS_COUNT; ix++)
-//     {
-//         led[ix] = CRGB::White;
-//     }
-
-//     for (int l = 0; l < random(4, 12); l++)
-//     {
-//         FastLED.setBrightness(random(20, 255));
-//         FastLED.show();
-//         delay(random(1, 50));
-
-//         FastLED.setBrightness(0);
-//         FastLED.show();
-//         delay(random(1, 150));
-//     }
-
-//     FastLED.setBrightness(previousBrightness);
-
-//     for (int ix = 0; ix < LEDS_COUNT; ix++)
-//     {
-//         led[ix] = CRGB::Black;
-//     }
-//     FastLED.show();
-
-//     showOngoing = false;
-// }
-
-void readSensor()
+void lightningShow()
 {
+    showOngoing = true;
+
+    byte previousBrightness = FastLED.getBrightness();
+
+    for (int ix = 0; ix < LEDS_COUNT; ix++)
+    {
+        led[ix] = CRGB::White;
+    }
+
+    for (int l = 0; l < random(4, 12); l++)
+    {
+        FastLED.setBrightness(random(20, 255));
+        FastLED.show();
+        delay(random(1, 50));
+
+        FastLED.setBrightness(0);
+        FastLED.show();
+        delay(random(1, 150));
+    }
+
+    FastLED.setBrightness(previousBrightness);
+
+    for (int ix = 0; ix < LEDS_COUNT; ix++)
+    {
+        led[ix] = CRGB::Black;
+    }
+    FastLED.show();
+
+    showOngoing = false;
 }
 
 void loop()
-{    
+{
     if (buttonInterrupt)
     {
         display->keepAwake();
@@ -160,8 +157,12 @@ void loop()
 
     if (thunderInterrupt)
     {
-        thunderstorm->strikeDetected();
         thunderInterrupt = false;
+        
+        if (thunderstorm->strikeDetected())
+        {
+            lightningShow();
+        }        
     }
 
     thunderstorm->loop();

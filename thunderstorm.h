@@ -28,7 +28,7 @@ public:
     Thunderstorm();    
     void loop();
     bool isActive();
-    void strikeDetected();
+    bool strikeDetected();
 };
 
 #endif

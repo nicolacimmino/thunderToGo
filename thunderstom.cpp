@@ -6,8 +6,9 @@ Thunderstorm::Thunderstorm()
 
     this->lightning->begin();
     this->lightning->resetSettings();
-    this->lightning->setIndoorOutdoor(OUTDOOR);
-    this->lightning->spikeRejection(0);
+    this->lightning->setIndoorOutdoor(INDOOR);
+    this->lightning->spikeRejection(2);
+    this->lightning->maskDisturber(0);
 }
 
 void Thunderstorm::loop()
@@ -15,21 +16,23 @@ void Thunderstorm::loop()
     if (!this->isActive())
     {
         this->strikes = 0;
-        this->interferers = 0;
     }
 }
-void Thunderstorm::strikeDetected()
+
+bool Thunderstorm::strikeDetected()
 {
     // Need to wait at least 2mS from interrupt before reading the interrupt register.
     delay(2);
 
-    byte interruptVector = this->lightning->readInterruptReg();
+    uint8_t interruptVector = this->lightning->readInterruptReg();
+
+this->interferers++;  
 
     if (interruptVector == DISTURBER_INT)
     {
-        this->interferers++;
-
-        return;
+        this->interferers++;  
+        
+        return true;
     }
 
     if (interruptVector == LIGHTNING_INT)
@@ -38,13 +41,15 @@ void Thunderstorm::strikeDetected()
         this->lastStrikeTime = millis();
 
         this->energy = this->lightning->lightningEnergy();
-        this->distance = this->lightning->distanceToStorm();
+        this->distance = this->lightning->distanceToStorm();        
+        
+        return true;
+    }    
 
-        return;
-    }
+    return false;
 }
 
 bool Thunderstorm::isActive()
 {
-    return this->lastStrikeTime < STORM_TIMEOUT_MS;
+    return this->lastStrikeTime > 0 && this->lastStrikeTime < STORM_TIMEOUT_MS;
 }

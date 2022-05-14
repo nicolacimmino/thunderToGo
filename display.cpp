@@ -7,7 +7,11 @@ Display::Display(Thunderstorm *thunderstorm)
     this->oled = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
     this->oled->begin(SSD1306_SWITCHCAPVCC, DISPLAY_I2C_ADDRESS);
+    this->oled->dim(0);
     this->oled->clearDisplay();
+    this->oled->setTextSize(1);              // Normal 1:1 pixel scale
+    this->oled->setTextColor(SSD1306_WHITE); // Draw white text
+    this->oled->cp437(true);                 // Use full 256 char 'Code Page 437' font
 }
 
 void Display::loop()
@@ -41,7 +45,12 @@ void Display::keepAwake()
 
 void Display::reportStatus()
 {
-    char message[160];
+    if (this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
+    {
+        return;
+    }
+
+    this->lastScreenRefresh = millis();
 
     //if (!thunderstormActive)
     // if (1)
@@ -59,34 +68,32 @@ void Display::reportStatus()
 
     uint16_t timeInMinutes = (this->thunderstorm->lastStrikeTime - millis()) / 60000;
 
-    sprintf(message, "        Thunder  \n"
-                     "                   \n"
-                     "STK: %d            \n"
-                     "DST: %d            \n"
-                     "ENE: %d            \n"
-                     "TMS: %d            \n"
-                     "INT: %d            \n",
+    this->thunderstorm->distance++;
+
+    sprintf(this->buffer, "        Thunder  \n"
+                          "                   \n"
+                          "STK: %d            \n"
+                          "DST: %d            \n"
+                          "ENE: %d            \n"
+                          "TMS: %d            \n"
+                          "INT: %d            \n",
             this->thunderstorm->strikes, this->thunderstorm->distance, this->thunderstorm->energy, 0, this->thunderstorm->interferers);
 
-    static uint16_t lastPoorCrc = 0;
+    //static uint16_t lastPoorCrc = 0;
 
-    uint16_t poorCrc = 0;
-    for (uint8_t ix = 0; ix < strlen(message); ix++)
-    {
-        poorCrc += message[ix];
-    }
+    // uint16_t poorCrc = 0;
+    // for (uint8_t ix = 0; ix < strlen(message); ix++)
+    // {
+    //     poorCrc += message[ix];
+    // }
 
-    if (poorCrc != lastPoorCrc)
-    {
-        this->oled->dim(0);
-        this->oled->clearDisplay();
-        this->oled->setTextSize(1);              // Normal 1:1 pixel scale
-        this->oled->setTextColor(SSD1306_WHITE); // Draw white text
-        this->oled->cp437(true);                 // Use full 256 char 'Code Page 437' font
-        this->oled->setCursor(0, 1);
-        this->oled->write(message);
-        this->oled->display();
+    // if (poorCrc != lastPoorCrc)
+    // {
+    this->oled->clearDisplay();
+    this->oled->setCursor(0, 1);
+    this->oled->write(this->buffer);
+    this->oled->display();
 
-        lastPoorCrc = poorCrc;
-    }
+    //    lastPoorCrc = poorCrc;
+    // }
 }

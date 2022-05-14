@@ -20,7 +20,9 @@ private:
     unsigned long idleSince = 0;
     Adafruit_SSD1306 *oled;
     void reportStatus();
-
+    char buffer[160];
+    unsigned long lastScreenRefresh = 0;
+    
 public:
     Display(Thunderstorm *thunderstorm);
     void loop();
