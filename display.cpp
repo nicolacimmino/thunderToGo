@@ -52,48 +52,18 @@ void Display::reportStatus()
 
     this->lastScreenRefresh = millis();
 
-    //if (!thunderstormActive)
-    // if (1)
-    // {
-    //     strcpy(message, "        Thunder  \n"
-    //                     "                   \n"
-    //                     "STK: ---            \n"
-    //                     "DST: ---            \n"
-    //                     "ENE: ---            \n"
-    //                     "TMS: ---            \n"
-    //                     "                   \n");
-    // }
-    // else
-    // {
-
-    uint16_t timeInMinutes = (this->thunderstorm->lastStrikeTime - millis()) / 60000;
-
-    this->thunderstorm->distance++;
+    uint16_t timeInMinutes = this->thunderstorm->lastStrikeTime > 0 ? ((millis() - this->thunderstorm->lastStrikeTime) / 60000) : 0;
 
     sprintf(this->buffer, "        Thunder  \n"
                           "                   \n"
                           "STK: %d            \n"
                           "DST: %d            \n"
-                          "ENE: %d            \n"
                           "TMS: %d            \n"
                           "INT: %d            \n",
-            this->thunderstorm->strikes, this->thunderstorm->distance, this->thunderstorm->energy, 0, this->thunderstorm->interferers);
+            this->thunderstorm->strikes, this->thunderstorm->distance, timeInMinutes, this->thunderstorm->interferers);
 
-    //static uint16_t lastPoorCrc = 0;
-
-    // uint16_t poorCrc = 0;
-    // for (uint8_t ix = 0; ix < strlen(message); ix++)
-    // {
-    //     poorCrc += message[ix];
-    // }
-
-    // if (poorCrc != lastPoorCrc)
-    // {
     this->oled->clearDisplay();
     this->oled->setCursor(0, 1);
     this->oled->write(this->buffer);
     this->oled->display();
-
-    //    lastPoorCrc = poorCrc;
-    // }
 }

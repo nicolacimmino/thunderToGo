@@ -10,7 +10,7 @@
 #define DISTURBER_INT 0x04
 #define NOISE_INT 0x01
 
-#define STORM_TIMEOUT_MS 1000 * 60 * 20
+#define STORM_TIMEOUT_MS 1200000
 
 class Thunderstorm
 {
@@ -25,7 +25,7 @@ public:
     uint16_t interferers = 0;
     unsigned long lastStrikeTime = 0;
 
-    Thunderstorm();    
+    Thunderstorm();
     void loop();
     bool isActive();
     bool strikeDetected();

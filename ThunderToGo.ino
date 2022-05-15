@@ -29,8 +29,6 @@
 Display *display;
 Thunderstorm *thunderstorm;
 
-bool showOngoing = false;
-
 CRGB led[LEDS_COUNT];
 
 bool buttonInterrupt = false;
@@ -61,12 +59,6 @@ void setup()
         led[ix] = CRGB::Black;
     }
 
-    //Setup a watchdog interrupt every 64mS.
-    cli();
-    _WD_CONTROL_REG = (1 << WDCE) | (1 << WDE);
-    _WD_CONTROL_REG = (1 << WDIE) | (1 << WDP1);
-    sei();
-
     pinMode(PIN_BUTTON, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(PIN_BUTTON), buttonISR, FALLING);
 
@@ -74,50 +66,8 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(PIN_THUNDER_IRQ), thunderISR, RISING);
 }
 
-ISR(WDT_vect)
-{
-    if (showOngoing)
-    {
-        return;
-    }
-
-    uint8_t timeSinceLastStrikeMinutes = floor(((millis() - thunderstorm->lastStrikeTime) / 60000));
-
-    float breathRate = (thunderstorm->isActive() && timeSinceLastStrikeMinutes < 5) ? (2000.0 / (float)(min(thunderstorm->strikes, 10))) : 2000.0;
-
-    // Keep breathing! See Sean Voisen great post from which I grabbed the formula.
-    // https://sean.voisen.org/blog/2011/10/breathing-led-with-arduino/
-    float val = (exp(sin(millis() / breathRate * PI)) - 0.36787944) * 108.0;
-
-    if (!thunderstorm->isActive())
-    {
-        CRGB noStormColor = CRGB::DarkGreen;
-        noStormColor.fadeToBlackBy(255 - val);
-
-        for (int ix = 0; ix < LEDS_COUNT; ix++)
-        {
-            led[ix] = noStormColor;
-        }
-
-        FastLED.show();
-
-        return;
-    }
-
-    CRGB color = CHSV(timeSinceLastStrikeMinutes, 255, 255);
-    color.fadeToBlackBy(255 - val);
-
-    for (int ix = 0; ix < LEDS_COUNT; ix++)
-    {
-        led[ix] = color;
-    }
-    FastLED.show();
-}
-
 void lightningShow()
 {
-    showOngoing = true;
-
     byte previousBrightness = FastLED.getBrightness();
 
     for (int ix = 0; ix < LEDS_COUNT; ix++)
@@ -143,8 +93,6 @@ void lightningShow()
         led[ix] = CRGB::Black;
     }
     FastLED.show();
-
-    showOngoing = false;
 }
 
 void loop()
@@ -158,13 +106,27 @@ void loop()
     if (thunderInterrupt)
     {
         thunderInterrupt = false;
-        
+
         if (thunderstorm->strikeDetected())
         {
             lightningShow();
-        }        
+        }
     }
 
     thunderstorm->loop();
     display->loop();
+
+    for (int ix = 0; ix < LEDS_COUNT; ix++)
+    {
+        if (millis() % (thunderstorm->isActive() ? 1000 : 2000) < 100)
+        {
+            led[ix] = thunderstorm->isActive() ? CRGB::Red : CRGB::Green;
+        }
+        else
+        {
+            led[ix] = CRGB::Black;
+        }
+    }
+
+    FastLED.show();
 }
