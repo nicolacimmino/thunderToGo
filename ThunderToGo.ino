@@ -14,10 +14,8 @@
 //    along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include <SPI.h>
 #include <Wire.h>
 #include <FastLED.h>
-#include <avr/wdt.h>
 
 #define LEDS_COUNT 1
 #define PIN_BUTTON 7
