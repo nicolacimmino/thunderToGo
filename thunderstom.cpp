@@ -51,3 +51,8 @@ bool Thunderstorm::isActive()
 {
     return this->strikes > 0 && (millis() - this->lastStrikeTime) < STORM_TIMEOUT_MS;
 }
+
+uint8_t Thunderstorm::minutesSinceLastStrike()
+{
+    return this->lastStrikeTime > 0 ? ((millis() - this->lastStrikeTime) / 60000) : 0;
+}

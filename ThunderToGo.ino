@@ -97,7 +97,7 @@ void loop()
 {
     if (buttonInterrupt)
     {
-        display->keepAwake();
+        display->onClick();
         buttonInterrupt = false;
     }
 

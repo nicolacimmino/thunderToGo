@@ -29,6 +29,7 @@ public:
     void loop();
     bool isActive();
     bool strikeDetected();
+    uint8_t minutesSinceLastStrike();
 };
 
 #endif

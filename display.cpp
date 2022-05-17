@@ -29,7 +29,15 @@ void Display::loop()
         return;
     }
 
-    this->reportStatus();
+    switch (this->mode)
+    {
+    case DISPLAY_MODE_MAIN:
+        this->loopMainMode();
+        break;
+    case DISPLAY_MODE_STATS:
+        this->loopStatsMode();
+        break;
+    }
 }
 
 void Display::keepAwake()
@@ -43,7 +51,68 @@ void Display::keepAwake()
     }
 }
 
-void Display::reportStatus()
+void Display::onClick()
+{
+    if (this->awake)
+    {
+        this->mode = (this->mode + 1) % DISPLAY_MODES;
+        this->lastScreenRefresh = 0;
+    }
+
+    this->keepAwake();
+}
+
+void Display::loopMainMode()
+{
+    if (this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
+    {
+        return;
+    }
+
+    this->oled->clearDisplay();
+    this->oled->setCursor(0, 1);
+    this->oled->print(getBatteryLevel());
+    this->oled->print("%");
+
+    if (!this->thunderstorm->isActive())
+    {
+        this->oled->drawBitmap(
+            (this->oled->width() - ICONS_WIDTH) / 2,
+            16,
+            sunIcon,
+            ICONS_WIDTH,
+            ICONS_HEIGHT,
+            SSD1306_WHITE);
+    }
+    else
+    {
+        this->oled->drawBitmap(
+            (this->oled->width() - ICONS_WIDTH) / 2,
+            16,
+            thunderIcon,
+            ICONS_WIDTH,
+            ICONS_HEIGHT,
+            SSD1306_WHITE);
+
+        this->oled->setTextColor(SSD1306_BLACK);
+        this->oled->setCursor(53, 35);
+        sprintf(this->buffer, "%04d", this->thunderstorm->strikes);
+        this->oled->print(this->buffer);
+
+        this->oled->setTextColor(SSD1306_WHITE);
+        this->oled->setCursor(10, 20);
+        this->oled->print(this->thunderstorm->distance);
+        this->oled->print(" km");
+
+        this->oled->setCursor(90, 20);
+        this->oled->print(this->thunderstorm->minutesSinceLastStrike());
+        this->oled->print(" min");
+    }
+
+    this->oled->display();
+}
+
+void Display::loopStatsMode()
 {
     if (this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
     {
