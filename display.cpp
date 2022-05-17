@@ -93,6 +93,9 @@ void Display::loopMainMode()
             ICONS_HEIGHT,
             SSD1306_WHITE);
 
+        this->oled->setCursor(90, 20);
+        this->oled->print(this->thunderstorm->secondsSinceLastSensorEvent());
+        this->oled->print(" s");
         this->oled->display();
 
         return;
@@ -145,8 +148,8 @@ void Display::loopStatsMode()
                           "DST: %d            \n"
                           "TMS: %d            \n"
                           "SNS: %d            \n",
-            this->thunderstorm->strikes, 
-            this->thunderstorm->distance, 
+            this->thunderstorm->strikes,
+            this->thunderstorm->distance,
             this->thunderstorm->minutesSinceLastStrike(),
             this->thunderstorm->secondsSinceLastSensorEvent());
 

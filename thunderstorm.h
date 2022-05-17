@@ -11,7 +11,7 @@
 #define NOISE_INT 0x01
 
 #define STORM_TIMEOUT_MS 1200000
-#define SENSOR_MAX_INTERVAL_MS 60000
+#define SENSOR_MAX_INTERVAL_MS 12000
 
 class Thunderstorm
 {
