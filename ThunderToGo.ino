@@ -98,6 +98,12 @@ void loop()
     if (buttonInterrupt)
     {
         display->onClick();
+
+        while (digitalRead(PIN_BUTTON) == LOW)
+        {
+            delay(1);
+        }
+
         buttonInterrupt = false;
     }
 

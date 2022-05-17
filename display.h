@@ -25,13 +25,14 @@ private:
     bool awake = true;
     unsigned long idleSince = 0;
     Adafruit_SSD1306 *oled;
-    void loopMainMode();
-    void loopStatsMode();
     char buffer[160];
     unsigned long lastScreenRefresh = 0;
     uint8_t mode = 0;
 
+    void printHeader();
     void keepAwake();
+    void loopMainMode();
+    void loopStatsMode();
 
 public:
     Display(Thunderstorm *thunderstorm);

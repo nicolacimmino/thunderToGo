@@ -29,6 +29,13 @@ void Display::loop()
         return;
     }
 
+    if (this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
+    {
+        return;
+    }
+
+    this->lastScreenRefresh = millis();
+
     switch (this->mode)
     {
     case DISPLAY_MODE_MAIN:
@@ -60,19 +67,36 @@ void Display::onClick()
     }
 
     this->keepAwake();
+    this->loop();
+}
+
+void Display::printHeader()
+{
+    this->oled->setCursor(0, 1);
+    this->oled->print(getBatteryLevel());
+    this->oled->print("%");
 }
 
 void Display::loopMainMode()
 {
-    if (this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
+    this->oled->clearDisplay();
+
+    this->printHeader();
+
+    if (!this->thunderstorm->isSensorActive())
     {
+        this->oled->drawBitmap(
+            (this->oled->width() - ICONS_WIDTH) / 2,
+            16,
+            brokenLinkIcon,
+            ICONS_WIDTH,
+            ICONS_HEIGHT,
+            SSD1306_WHITE);
+
+        this->oled->display();
+
         return;
     }
-
-    this->oled->clearDisplay();
-    this->oled->setCursor(0, 1);
-    this->oled->print(getBatteryLevel());
-    this->oled->print("%");
 
     if (!this->thunderstorm->isActive())
     {
@@ -83,56 +107,52 @@ void Display::loopMainMode()
             ICONS_WIDTH,
             ICONS_HEIGHT,
             SSD1306_WHITE);
+
+        this->oled->display();
+
+        return;
     }
-    else
-    {
-        this->oled->drawBitmap(
-            (this->oled->width() - ICONS_WIDTH) / 2,
-            16,
-            thunderIcon,
-            ICONS_WIDTH,
-            ICONS_HEIGHT,
-            SSD1306_WHITE);
 
-        this->oled->setTextColor(SSD1306_BLACK);
-        this->oled->setCursor(53, 35);
-        sprintf(this->buffer, "%04d", this->thunderstorm->strikes);
-        this->oled->print(this->buffer);
+    this->oled->drawBitmap(
+        (this->oled->width() - ICONS_WIDTH) / 2,
+        16,
+        thunderIcon,
+        ICONS_WIDTH,
+        ICONS_HEIGHT,
+        SSD1306_WHITE);
 
-        this->oled->setTextColor(SSD1306_WHITE);
-        this->oled->setCursor(10, 20);
-        this->oled->print(this->thunderstorm->distance);
-        this->oled->print(" km");
+    this->oled->setTextColor(SSD1306_BLACK);
+    this->oled->setCursor(53, 35);
+    sprintf(this->buffer, "%04d", this->thunderstorm->strikes);
+    this->oled->print(this->buffer);
 
-        this->oled->setCursor(90, 20);
-        this->oled->print(this->thunderstorm->minutesSinceLastStrike());
-        this->oled->print(" min");
-    }
+    this->oled->setTextColor(SSD1306_WHITE);
+    this->oled->setCursor(10, 20);
+    this->oled->print(this->thunderstorm->distance);
+    this->oled->print(" km");
+
+    this->oled->setCursor(90, 20);
+    this->oled->print(this->thunderstorm->minutesSinceLastStrike());
+    this->oled->print(" min");
 
     this->oled->display();
 }
 
 void Display::loopStatsMode()
 {
-    if (this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
-    {
-        return;
-    }
-
-    this->lastScreenRefresh = millis();
-
-    uint16_t timeInMinutes = this->thunderstorm->lastStrikeTime > 0 ? ((millis() - this->thunderstorm->lastStrikeTime) / 60000) : 0;
-
-    sprintf(this->buffer, "        Thunder  \n"
-                          "                   \n"
+    sprintf(this->buffer, "    Registers      \n"
                           "STK: %d            \n"
                           "DST: %d            \n"
                           "TMS: %d            \n"
-                          "INT: %d            \n",
-            this->thunderstorm->strikes, this->thunderstorm->distance, timeInMinutes, this->thunderstorm->interferers);
+                          "SNS: %d            \n",
+            this->thunderstorm->strikes, 
+            this->thunderstorm->distance, 
+            this->thunderstorm->minutesSinceLastStrike(),
+            this->thunderstorm->secondsSinceLastSensorEvent());
 
     this->oled->clearDisplay();
-    this->oled->setCursor(0, 1);
+    this->printHeader();
+    this->oled->setCursor(0, 20);
     this->oled->write(this->buffer);
     this->oled->display();
 }
