@@ -74,3 +74,20 @@ uint8_t Thunderstorm::getRejectSpikes()
 {
     return this->lightning->readSpikeRejection();
 }
+
+void Thunderstorm::changeMode()
+{
+    if (this->isIndoorMode())
+    {
+        this->lightning->setIndoorOutdoor(OUTDOOR);
+    }
+    else
+    {
+        this->lightning->setIndoorOutdoor(INDOOR);
+    }
+}
+
+void Thunderstorm::increaseRejectSpikes()
+{
+    this->lightning->spikeRejection(max(1, (this->getRejectSpikes() + 1) % MAX_SPIKE_REJECT));
+}

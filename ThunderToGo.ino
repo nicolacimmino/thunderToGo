@@ -93,18 +93,36 @@ void lightningShow()
     FastLED.show();
 }
 
+void serveButton()
+{
+    unsigned long pressStartTime = millis();
+
+    while (digitalRead(PIN_BUTTON) == LOW && (millis() - pressStartTime) < 500)
+    {
+        delay(1);
+    }
+
+    if ((millis() - pressStartTime) < 400)
+    {
+        display->onClick();
+    }
+    else
+    {
+        display->onLongPress();
+    }
+
+    while (digitalRead(PIN_BUTTON) == LOW)
+    {
+        delay(1);
+    }
+
+    buttonInterrupt = false;
+}
 void loop()
 {
     if (buttonInterrupt)
     {
-        display->onClick();
-
-        while (digitalRead(PIN_BUTTON) == LOW)
-        {
-            delay(1);
-        }
-
-        buttonInterrupt = false;
+        serveButton();
     }
 
     if (thunderInterrupt)

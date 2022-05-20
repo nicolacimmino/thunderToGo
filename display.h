@@ -46,6 +46,7 @@ public:
     Display(Thunderstorm *thunderstorm);
     void loop();
     void onClick();
+    void onLongPress();
 };
 
 #endif

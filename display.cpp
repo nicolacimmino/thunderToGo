@@ -81,10 +81,37 @@ void Display::onClick()
     this->loop();
 }
 
+void Display::onLongPress()
+{
+    switch (this->mode)
+    {
+    case DISPLAY_MODE_INOUTDOOR:
+        this->thunderstorm->changeMode();
+        break;
+    case DISPLAY_MODE_REJECTSPIKES:
+        this->thunderstorm->increaseRejectSpikes();
+        break;
+    }
+
+    this->keepAwake();
+    this->loop();
+}
+
 void Display::printHeader()
 {
     sprintf(this->buffer, "%d %%", getBatteryLevel());
     this->writeRight(0);
+
+    if (this->thunderstorm->isIndoorMode())
+    {
+        sprintf(this->buffer, "INDOOR");
+    }
+    else
+    {
+        sprintf(this->buffer, "OUTDOOR");
+    }
+
+    this->write(0, 0);
 }
 
 void Display::loopMainMode()

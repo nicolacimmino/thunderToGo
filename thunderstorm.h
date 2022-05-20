@@ -10,6 +10,8 @@
 #define DISTURBER_INT 0x04
 #define NOISE_INT 0x01
 
+#define MAX_SPIKE_REJECT 8
+
 #define STORM_TIMEOUT_MS 1200000
 #define SENSOR_MAX_INTERVAL_MINUTES 15
 
@@ -24,7 +26,7 @@ private:
 public:
     uint16_t strikes = 0;
     uint8_t distance = 0;
-    
+
     Thunderstorm();
     void loop();
     bool isActive();
@@ -34,6 +36,8 @@ public:
     bool isSensorActive();
     bool isIndoorMode();
     uint8_t getRejectSpikes();
+    void changeMode();
+    void increaseRejectSpikes();
 };
 
 #endif
