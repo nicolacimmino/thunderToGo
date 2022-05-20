@@ -1,5 +1,7 @@
 #include "system.h"
 
+long measuredVcc = 0;
+
 uint8_t getBatteryLevel()
 {
     // See this article for an in-depth explanation.
@@ -13,7 +15,7 @@ uint8_t getBatteryLevel()
     while (bit_is_set(ADCSRA, ADSC))
         ;
 
-    long measuredVcc = 1125300L / (ADCL | (ADCH << 8));
+    measuredVcc = 1125300L / (ADCL | (ADCH << 8));
     analogReference(DEFAULT);
 
     return min(max((measuredVcc - 2700) / 7, 0), 100);

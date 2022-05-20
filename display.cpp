@@ -36,6 +36,9 @@ void Display::loop()
 
     this->lastScreenRefresh = millis();
 
+    this->oled->clearDisplay();
+    this->printHeader();
+
     switch (this->mode)
     {
     case DISPLAY_MODE_MAIN:
@@ -72,17 +75,12 @@ void Display::onClick()
 
 void Display::printHeader()
 {
-    this->oled->setCursor(0, 1);
-    this->oled->print(getBatteryLevel());
-    this->oled->print("%");
+    sprintf(this->buffer, "%d %%", getBatteryLevel());
+    this->writeRight(0);
 }
 
 void Display::loopMainMode()
 {
-    this->oled->clearDisplay();
-
-    this->printHeader();
-
     if (!this->thunderstorm->isSensorActive())
     {
         this->oled->drawBitmap(
@@ -142,20 +140,48 @@ void Display::loopMainMode()
 }
 
 void Display::loopStatsMode()
-{
-    sprintf(this->buffer, "    Registers      \n"
-                          "STK: %d            \n"
-                          "DST: %d            \n"
-                          "TMS: %d            \n"
-                          "SNS: %d            \n",
-            this->thunderstorm->strikes,
-            this->thunderstorm->distance,
-            this->thunderstorm->minutesSinceLastStrike(),
-            this->thunderstorm->minutesSinceLastSensorEvent());
+{   
+    sprintf(this->buffer, "Registers");
+    this->writeCentered(16);
 
-    this->oled->clearDisplay();
-    this->printHeader();
-    this->oled->setCursor(0, 20);
-    this->oled->write(this->buffer);
+    sprintf(this->buffer, "STK: %04d   DST: %04d", this->thunderstorm->strikes, this->thunderstorm->distance);
+    this->write(0, 32);
+
+    sprintf(this->buffer, "TMS: %04d   SNS: %04d", this->thunderstorm->minutesSinceLastStrike(), this->thunderstorm->minutesSinceLastSensorEvent());
+    this->write(0, 42);
+
+    sprintf(this->buffer, "BAT: %04d   UPT: %04d", measuredVcc, millis() / 60000);
+    this->write(0, 52);
+
     this->oled->display();
+}
+
+void Display::writeCentered(uint8_t y)
+{
+    int16_t x1;
+    int16_t y1;
+    uint16_t w;
+    uint16_t h;
+
+    this->oled->getTextBounds(this->buffer, 0, 0, &x1, &y1, &w, &h);
+    this->oled->setCursor((SCREEN_WIDTH - w) / 2, y);
+    this->oled->write(this->buffer);
+}
+
+void Display::writeRight(uint8_t y)
+{
+    int16_t x1;
+    int16_t y1;
+    uint16_t w;
+    uint16_t h;
+
+    this->oled->getTextBounds(this->buffer, 0, 0, &x1, &y1, &w, &h);
+    this->oled->setCursor((SCREEN_WIDTH - w), y);
+    this->oled->write(this->buffer);
+}
+
+void Display::write(uint8_t x, uint8_t y)
+{
+    this->oled->setCursor(x, y);
+    this->oled->write(this->buffer);
 }

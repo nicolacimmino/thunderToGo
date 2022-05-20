@@ -34,6 +34,10 @@ private:
     void loopMainMode();
     void loopStatsMode();
 
+    void writeCentered(uint8_t y);
+    void writeRight(uint8_t y);    
+    void write(uint8_t x, uint8_t y);
+
 public:
     Display(Thunderstorm *thunderstorm);
     void loop();

@@ -6,4 +6,6 @@
 
 uint8_t getBatteryLevel();
 
+extern long measuredVcc;
+
 #endif
