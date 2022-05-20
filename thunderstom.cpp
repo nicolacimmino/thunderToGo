@@ -52,10 +52,10 @@ uint8_t Thunderstorm::minutesSinceLastStrike()
 
 bool Thunderstorm::isSensorActive()
 {
-    return (millis() - this->lastSensorEventTime) < SENSOR_MAX_INTERVAL_MS;
+    return this->minutesSinceLastSensorEvent() < SENSOR_MAX_INTERVAL_MINUTES;
 }
 
-uint32_t Thunderstorm::secondsSinceLastSensorEvent()
+uint32_t Thunderstorm::minutesSinceLastSensorEvent()
 {
-    return (millis() - this->lastSensorEventTime) / 1000;
+    return (millis() - this->lastSensorEventTime) / 60000;
 }

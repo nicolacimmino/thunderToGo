@@ -11,7 +11,7 @@
 #define NOISE_INT 0x01
 
 #define STORM_TIMEOUT_MS 1200000
-#define SENSOR_MAX_INTERVAL_MS 12000
+#define SENSOR_MAX_INTERVAL_MINUTES 15
 
 class Thunderstorm
 {
@@ -30,7 +30,7 @@ public:
     bool isActive();
     bool strikeDetected();
     uint8_t minutesSinceLastStrike();
-    uint32_t secondsSinceLastSensorEvent();
+    uint32_t minutesSinceLastSensorEvent();
     bool isSensorActive();
 };
 

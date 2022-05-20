@@ -94,8 +94,8 @@ void Display::loopMainMode()
             SSD1306_WHITE);
 
         this->oled->setCursor(90, 20);
-        this->oled->print(this->thunderstorm->secondsSinceLastSensorEvent());
-        this->oled->print(" s");
+        this->oled->print(this->thunderstorm->minutesSinceLastSensorEvent());
+        this->oled->print(" min");
         this->oled->display();
 
         return;
@@ -151,7 +151,7 @@ void Display::loopStatsMode()
             this->thunderstorm->strikes,
             this->thunderstorm->distance,
             this->thunderstorm->minutesSinceLastStrike(),
-            this->thunderstorm->secondsSinceLastSensorEvent());
+            this->thunderstorm->minutesSinceLastSensorEvent());
 
     this->oled->clearDisplay();
     this->printHeader();

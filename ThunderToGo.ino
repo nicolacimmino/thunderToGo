@@ -17,7 +17,7 @@
 #include <Wire.h>
 #include <FastLED.h>
 
-#define LEDS_COUNT 1
+#define LEDS_COUNT 2
 #define PIN_BUTTON 7
 #define PIN_THUNDER_IRQ 0
 
@@ -120,10 +120,23 @@ void loop()
     thunderstorm->loop();
     display->loop();
 
+    uint16_t interval = (thunderstorm->isActive() ? 500 : 2000);
+
+    if (!thunderstorm->isSensorActive())
+    {
+        interval = 500;
+    }
+
     for (int ix = 0; ix < LEDS_COUNT; ix++)
     {
-        if (millis() % (thunderstorm->isActive() ? 1000 : 2000) < 100)
+        if (millis() % interval < 100)
         {
+            if (!thunderstorm->isSensorActive())
+            {
+                led[ix] = CRGB::Blue;
+                continue;
+            }
+
             led[ix] = thunderstorm->isActive() ? CRGB::Red : CRGB::Green;
         }
         else
