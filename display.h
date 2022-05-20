@@ -16,7 +16,9 @@
 
 #define DISPLAY_MODE_MAIN 0
 #define DISPLAY_MODE_STATS 1
-#define DISPLAY_MODES 2
+#define DISPLAY_MODE_INOUTDOOR 2
+#define DISPLAY_MODE_REJECTSPIKES 3
+#define DISPLAY_MODES 4
 
 class Display
 {
@@ -33,9 +35,11 @@ private:
     void keepAwake();
     void loopMainMode();
     void loopStatsMode();
+    void loopInOutdoor();
+    void loopRejectSpikes();
 
     void writeCentered(uint8_t y);
-    void writeRight(uint8_t y);    
+    void writeRight(uint8_t y);
     void write(uint8_t x, uint8_t y);
 
 public:

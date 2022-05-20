@@ -8,6 +8,11 @@ Thunderstorm::Thunderstorm()
     this->lightning->resetSettings();
     this->lightning->setIndoorOutdoor(INDOOR);
     this->lightning->spikeRejection(2);
+
+    // Why not masking disturbers? We use this as a way to ensure the sensor
+    //  is connected and functioning. There's a piece of code that alerts if
+    //  nothing has been received from the sensor (including distrbers) for
+    //  a certain time.
     this->lightning->maskDisturber(0);
 }
 
@@ -26,7 +31,7 @@ bool Thunderstorm::strikeDetected()
     this->lastSensorEventTime = millis();
 
     uint8_t interruptVector = this->lightning->readInterruptReg();
-  
+
     if (interruptVector == LIGHTNING_INT)
     {
         this->strikes++;
@@ -58,4 +63,14 @@ bool Thunderstorm::isSensorActive()
 uint32_t Thunderstorm::minutesSinceLastSensorEvent()
 {
     return (millis() - this->lastSensorEventTime) / 60000;
+}
+
+bool Thunderstorm::isIndoorMode()
+{
+    return this->lightning->readIndoorOutdoor() == INDOOR;
+}
+
+uint8_t Thunderstorm::getRejectSpikes()
+{
+    return this->lightning->readSpikeRejection();
 }

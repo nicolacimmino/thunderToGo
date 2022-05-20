@@ -32,6 +32,8 @@ public:
     uint8_t minutesSinceLastStrike();
     uint32_t minutesSinceLastSensorEvent();
     bool isSensorActive();
+    bool isIndoorMode();
+    uint8_t getRejectSpikes();
 };
 
 #endif

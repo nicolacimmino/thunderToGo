@@ -47,7 +47,15 @@ void Display::loop()
     case DISPLAY_MODE_STATS:
         this->loopStatsMode();
         break;
+    case DISPLAY_MODE_INOUTDOOR:
+        this->loopInOutdoor();
+        break;
+    case DISPLAY_MODE_REJECTSPIKES:
+        this->loopRejectSpikes();
+        break;
     }
+
+    this->oled->display();
 }
 
 void Display::keepAwake()
@@ -135,12 +143,10 @@ void Display::loopMainMode()
     this->oled->setCursor(90, 20);
     this->oled->print(this->thunderstorm->minutesSinceLastStrike());
     this->oled->print(" min");
-
-    this->oled->display();
 }
 
 void Display::loopStatsMode()
-{   
+{
     sprintf(this->buffer, "Registers");
     this->writeCentered(16);
 
@@ -152,8 +158,39 @@ void Display::loopStatsMode()
 
     sprintf(this->buffer, "BAT: %04d   UPT: %04d", measuredVcc, millis() / 60000);
     this->write(0, 52);
+}
 
-    this->oled->display();
+void Display::loopInOutdoor()
+{
+    this->oled->setTextSize(2);
+
+    sprintf(this->buffer, "Mode");
+    this->writeCentered(16);
+
+    if (this->thunderstorm->isIndoorMode())
+    {
+        sprintf(this->buffer, "INDOOR");
+    }
+    else
+    {
+        sprintf(this->buffer, "OUTDOOR");
+    }
+
+    this->writeCentered(42);
+    this->oled->setTextSize(1);
+}
+
+void Display::loopRejectSpikes()
+{
+    this->oled->setTextSize(2);
+
+    sprintf(this->buffer, "Reject");
+    this->writeCentered(16);
+
+    sprintf(this->buffer, "%d", this->thunderstorm->getRejectSpikes());
+
+    this->writeCentered(42);
+    this->oled->setTextSize(1);
 }
 
 void Display::writeCentered(uint8_t y)
