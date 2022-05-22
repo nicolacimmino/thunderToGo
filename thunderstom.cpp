@@ -5,13 +5,8 @@ Thunderstorm::Thunderstorm()
     this->lightning = new SparkFun_AS3935(AS3935_ADDR);
 
     this->lightning->begin();
-
-    // Why not masking disturbers? We use this as a way to ensure the sensor
-    //  is connected and functioning. There's a piece of code that alerts if
-    //  nothing has been received from the sensor (including distrbers) for
-    //  a certain time.
-    // TODO: this has been dropped, needs anyway to be replaced by a test mode.
-    this->lightning->maskDisturber(0);
+        
+    this->lightning->maskDisturber(1);
 }
 
 void Thunderstorm::loop()
@@ -22,6 +17,10 @@ void Thunderstorm::loop()
         this->distance = 0;
         this->lastStrikeTime = 0;
     }
+
+    // Mask disturbers unless we are in test mode where disturbers
+    //  are treated as strikes.
+    this->lightning->maskDisturber(!this->testMode);
 }
 
 bool Thunderstorm::strikeDetected()
@@ -39,7 +38,18 @@ bool Thunderstorm::strikeDetected()
 
         return true;
     }
-       
+
+    // In test mode threat disturbers as strikes.
+    if (this->testMode && interruptVector == DISTURBER_INT)
+    {
+        this->strikes++;
+        this->lastStrikeTime = millis();
+
+        this->distance = random(0, 39);
+
+        return true;
+    }
+
     return false;
 }
 

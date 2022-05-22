@@ -19,8 +19,9 @@
 #define DISPLAY_MODE_BRIGHTNESS 1
 #define DISPLAY_MODE_INOUTDOOR 2
 #define DISPLAY_MODE_REJECTSPIKES 3
-#define DISPLAY_MODE_STATS 4
-#define DISPLAY_MODES 5
+#define DISPLAY_MODE_TEST 4
+#define DISPLAY_MODE_STATS 5
+#define DISPLAY_MODES 6
 
 #define MAX_BRIGHTNESS 4
 
@@ -41,6 +42,7 @@ private:
     void loopMainMode();
     void loopBrightness();
     void loopStatsMode();
+    void loopTestMode();
     void loopInOutdoor();
     void loopRejectSpikes();
 

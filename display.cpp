@@ -48,6 +48,9 @@ void Display::loop(bool forceRefresh)
     case DISPLAY_MODE_BRIGHTNESS:
         this->loopBrightness();
         break;
+    case DISPLAY_MODE_TEST:
+        this->loopTestMode();
+        break;
     case DISPLAY_MODE_STATS:
         this->loopStatsMode();
         break;
@@ -95,6 +98,9 @@ void Display::onLongPress()
     case DISPLAY_MODE_INOUTDOOR:
         this->thunderstorm->changeMode();
         break;
+    case DISPLAY_MODE_TEST:
+        this->thunderstorm->testMode = !this->thunderstorm->testMode;
+        break;
     case DISPLAY_MODE_REJECTSPIKES:
         this->thunderstorm->increaseRejectSpikes();
         break;
@@ -116,6 +122,11 @@ void Display::printHeader()
     else
     {
         sprintf(this->buffer, "OUTDOOR");
+    }
+
+    if (this->thunderstorm->testMode)
+    {
+        sprintf(this->buffer, "! TEST !");
     }
 
     this->write(0, 0);
@@ -196,6 +207,26 @@ void Display::loopInOutdoor()
     this->oled->setTextSize(1);
 }
 
+void Display::loopTestMode()
+{
+    this->oled->setTextSize(2);
+
+    sprintf(this->buffer, "Test");
+    this->writeCentered(16);
+
+    if (this->thunderstorm->testMode)
+    {
+        sprintf(this->buffer, "ON");
+    }
+    else
+    {
+        sprintf(this->buffer, "OFF");
+    }
+
+    this->writeCentered(42);
+    this->oled->setTextSize(1);
+}
+
 void Display::loopBrightness()
 {
     this->oled->setTextSize(2);
@@ -203,7 +234,7 @@ void Display::loopBrightness()
     sprintf(this->buffer, "Brightness");
     this->writeCentered(16);
 
-     if (this->leds->highBrightness)
+    if (this->leds->highBrightness)
     {
         sprintf(this->buffer, "HIGH");
     }
