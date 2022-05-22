@@ -40,10 +40,6 @@ bool Thunderstorm::strikeDetected()
         return true;
     }
        
-        this->strikes++;
-        this->lastStrikeTime = millis();
-        return true;
-        
     return false;
 }
 

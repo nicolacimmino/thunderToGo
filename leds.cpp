@@ -21,17 +21,26 @@ CRGB Leds::getStormColor()
         return CRGB::Green;
     }
 
-    // Red Hue=0, Green Hue=96. In 15min => 6.4/min    
+    // Red Hue=0, Green Hue=96. In 15min => 6.4/min
     return CRGB(CHSV(this->thunderstorm->minutesSinceLastStrike() * 6.4, 255, 255));
+}
+
+uint16_t Leds::getFlashInterval()
+{
+    if (!this->thunderstorm->isActive())
+    {
+        return 2000;
+    }
+
+    // 0km=> 200mS / 50km => 700mS
+    return 200 + (this->thunderstorm->distance * 10);
 }
 
 void Leds::loop()
 {
-    uint16_t interval = (this->thunderstorm->isActive() ? 500 : 2000);
-
     for (int ix = 0; ix < LEDS_COUNT; ix++)
     {
-        if (millis() % interval < 100)
+        if (millis() % this->getFlashInterval() < 100)
         {
             led[ix] = this->getStormColor();
         }

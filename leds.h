@@ -13,6 +13,7 @@ class Leds
         CRGB led[LEDS_COUNT];
         Thunderstorm *thunderstorm;
         CRGB getStormColor();
+        uint16_t getFlashInterval();
 
     public:
         Leds(Thunderstorm *thunderstorm);
