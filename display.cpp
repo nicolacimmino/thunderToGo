@@ -14,7 +14,7 @@ Display::Display(Thunderstorm *thunderstorm)
     this->oled->cp437(true);                 // Use full 256 char 'Code Page 437' font
 }
 
-void Display::loop()
+void Display::loop(bool forceRefresh)
 {
     if (!this->awake)
     {
@@ -29,7 +29,7 @@ void Display::loop()
         return;
     }
 
-    if (this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
+    if (!forceRefresh && this->lastScreenRefresh != 0 && millis() - this->lastScreenRefresh < 1000)
     {
         return;
     }
@@ -43,6 +43,9 @@ void Display::loop()
     {
     case DISPLAY_MODE_MAIN:
         this->loopMainMode();
+        break;
+    case DISPLAY_MODE_BRIGHTNESS:
+        this->loopBrightness();
         break;
     case DISPLAY_MODE_STATS:
         this->loopStatsMode();
@@ -78,13 +81,16 @@ void Display::onClick()
     }
 
     this->keepAwake();
-    this->loop();
+    this->loop(true);
 }
 
 void Display::onLongPress()
 {
     switch (this->mode)
     {
+    case DISPLAY_MODE_BRIGHTNESS:
+        this->highBrightness = !this->highBrightness;
+        break;
     case DISPLAY_MODE_INOUTDOOR:
         this->thunderstorm->changeMode();
         break;
@@ -94,7 +100,7 @@ void Display::onLongPress()
     }
 
     this->keepAwake();
-    this->loop();
+    this->loop(true);
 }
 
 void Display::printHeader()
@@ -207,6 +213,26 @@ void Display::loopInOutdoor()
     this->oled->setTextSize(1);
 }
 
+void Display::loopBrightness()
+{
+    this->oled->setTextSize(2);
+
+    sprintf(this->buffer, "Brightness");
+    this->writeCentered(16);
+
+     if (this->isHighBrightnessOn())
+    {
+        sprintf(this->buffer, "HIGH");
+    }
+    else
+    {
+        sprintf(this->buffer, "LOW");
+    }
+
+    this->writeCentered(42);
+    this->oled->setTextSize(1);
+}
+
 void Display::loopRejectSpikes()
 {
     this->oled->setTextSize(2);
@@ -248,4 +274,9 @@ void Display::write(uint8_t x, uint8_t y)
 {
     this->oled->setCursor(x, y);
     this->oled->write(this->buffer);
+}
+
+bool Display::isHighBrightnessOn()
+{
+    return this->highBrightness;
 }

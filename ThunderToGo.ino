@@ -110,12 +110,7 @@ void serveButton()
     {
         display->onLongPress();
     }
-
-    while (digitalRead(PIN_BUTTON) == LOW)
-    {
-        delay(1);
-    }
-
+  
     buttonInterrupt = false;
 }
 void loop()
@@ -136,7 +131,7 @@ void loop()
     }
 
     thunderstorm->loop();
-    display->loop();
+    display->loop(false);
 
     uint16_t interval = (thunderstorm->isActive() ? 500 : 2000);
 
@@ -162,6 +157,8 @@ void loop()
             led[ix] = CRGB::Black;
         }
     }
+
+    FastLED.setBrightness(display->isHighBrightnessOn() ? 255 : 40);
 
     FastLED.show();
 }

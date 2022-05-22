@@ -15,10 +15,13 @@
 #define DISPLAY_TIMEOUT_MS 10000
 
 #define DISPLAY_MODE_MAIN 0
-#define DISPLAY_MODE_INOUTDOOR 1
-#define DISPLAY_MODE_REJECTSPIKES 2
-#define DISPLAY_MODE_STATS 3
-#define DISPLAY_MODES 4
+#define DISPLAY_MODE_BRIGHTNESS 1
+#define DISPLAY_MODE_INOUTDOOR 2
+#define DISPLAY_MODE_REJECTSPIKES 3
+#define DISPLAY_MODE_STATS 4
+#define DISPLAY_MODES 5
+
+#define MAX_BRIGHTNESS 4
 
 class Display
 {
@@ -30,10 +33,12 @@ private:
     char buffer[160];
     unsigned long lastScreenRefresh = 0;
     uint8_t mode = 0;
+    bool highBrightness = true;
 
     void printHeader();
     void keepAwake();
     void loopMainMode();
+    void loopBrightness();
     void loopStatsMode();
     void loopInOutdoor();
     void loopRejectSpikes();
@@ -41,12 +46,13 @@ private:
     void writeCentered(uint8_t y);
     void writeRight(uint8_t y);
     void write(uint8_t x, uint8_t y);
-
+    
 public:
     Display(Thunderstorm *thunderstorm);
-    void loop();
+    void loop(bool forceRefresh);
     void onClick();
     void onLongPress();
+    bool isHighBrightnessOn();
 };
 
 #endif
