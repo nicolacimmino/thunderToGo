@@ -5,9 +5,6 @@ Thunderstorm::Thunderstorm()
     this->lightning = new SparkFun_AS3935(AS3935_ADDR);
 
     this->lightning->begin();
-    this->lightning->resetSettings();
-    this->lightning->setIndoorOutdoor(INDOOR);
-    this->lightning->spikeRejection(2);
 
     // Why not masking disturbers? We use this as a way to ensure the sensor
     //  is connected and functioning. There's a piece of code that alerts if

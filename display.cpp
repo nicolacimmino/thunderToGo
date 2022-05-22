@@ -183,7 +183,7 @@ void Display::loopStatsMode()
     sprintf(this->buffer, "TMS: %04d   SNS: %04d", this->thunderstorm->minutesSinceLastStrike(), this->thunderstorm->minutesSinceLastSensorEvent());
     this->write(0, 42);
 
-    sprintf(this->buffer, "BAT: %04d   UPT: %04d", measuredVcc, millis() / 60000);
+    sprintf(this->buffer, "BAT: %04d   UPT: %04d", measuredVcc, (uint16_t)floor(millis() / 60000));
     this->write(0, 52);
 }
 
