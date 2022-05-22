@@ -12,7 +12,7 @@
 
 #define MAX_SPIKE_REJECT 8
 
-#define STORM_TIMEOUT_MS 1200000
+#define STORM_TIMEOUT_MS (15*60*1000)
 #define SENSOR_MAX_INTERVAL_MINUTES 15
 
 class Thunderstorm
@@ -26,14 +26,13 @@ private:
 public:
     uint16_t strikes = 0;
     uint8_t distance = 0;
-
+    
     Thunderstorm();
     void loop();
     bool isActive();
     bool strikeDetected();
     uint8_t minutesSinceLastStrike();
     uint32_t minutesSinceLastSensorEvent();
-    bool isSensorActive();
     bool isIndoorMode();
     uint8_t getRejectSpikes();
     void changeMode();

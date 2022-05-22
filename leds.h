@@ -12,7 +12,8 @@ class Leds
     private:
         CRGB led[LEDS_COUNT];
         Thunderstorm *thunderstorm;
-        
+        CRGB getStormColor();
+
     public:
         Leds(Thunderstorm *thunderstorm);
         void loop();

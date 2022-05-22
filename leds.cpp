@@ -14,26 +14,26 @@ Leds::Leds(Thunderstorm *thunderstorm)
     }
 }
 
+CRGB Leds::getStormColor()
+{
+    if (!this->thunderstorm->isActive())
+    {
+        return CRGB::Green;
+    }
+
+    // Red Hue=0, Green Hue=96. In 15min => 6.4/min    
+    return CRGB(CHSV(this->thunderstorm->minutesSinceLastStrike() * 6.4, 255, 255));
+}
+
 void Leds::loop()
 {
     uint16_t interval = (this->thunderstorm->isActive() ? 500 : 2000);
-
-    if (!this->thunderstorm->isSensorActive())
-    {
-        interval = 500;
-    }
 
     for (int ix = 0; ix < LEDS_COUNT; ix++)
     {
         if (millis() % interval < 100)
         {
-            if (!this->thunderstorm->isSensorActive())
-            {
-                led[ix] = CRGB::Blue;
-                continue;
-            }
-
-            led[ix] = this->thunderstorm->isActive() ? CRGB::Red : CRGB::Green;
+            led[ix] = this->getStormColor();
         }
         else
         {

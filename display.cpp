@@ -123,24 +123,6 @@ void Display::printHeader()
 
 void Display::loopMainMode()
 {
-    if (!this->thunderstorm->isSensorActive())
-    {
-        this->oled->drawBitmap(
-            (this->oled->width() - ICONS_WIDTH) / 2,
-            16,
-            brokenLinkIcon,
-            ICONS_WIDTH,
-            ICONS_HEIGHT,
-            SSD1306_WHITE);
-
-        this->oled->setCursor(90, 20);
-        this->oled->print(this->thunderstorm->minutesSinceLastSensorEvent());
-        this->oled->print(" min");
-        this->oled->display();
-
-        return;
-    }
-
     if (!this->thunderstorm->isActive())
     {
         this->oled->drawBitmap(

@@ -10,6 +10,7 @@ Thunderstorm::Thunderstorm()
     //  is connected and functioning. There's a piece of code that alerts if
     //  nothing has been received from the sensor (including distrbers) for
     //  a certain time.
+    // TODO: this has been dropped, needs anyway to be replaced by a test mode.
     this->lightning->maskDisturber(0);
 }
 
@@ -39,6 +40,10 @@ bool Thunderstorm::strikeDetected()
         return true;
     }
        
+        this->strikes++;
+        this->lastStrikeTime = millis();
+        return true;
+        
     return false;
 }
 
@@ -50,11 +55,6 @@ bool Thunderstorm::isActive()
 uint8_t Thunderstorm::minutesSinceLastStrike()
 {
     return this->lastStrikeTime > 0 ? ((millis() - this->lastStrikeTime) / 60000) : 0;
-}
-
-bool Thunderstorm::isSensorActive()
-{
-    return this->minutesSinceLastSensorEvent() < SENSOR_MAX_INTERVAL_MINUTES;
 }
 
 uint32_t Thunderstorm::minutesSinceLastSensorEvent()
