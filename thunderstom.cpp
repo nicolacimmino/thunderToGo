@@ -38,7 +38,7 @@ bool Thunderstorm::strikeDetected()
 
         return true;
     }
-
+       
     return false;
 }
 

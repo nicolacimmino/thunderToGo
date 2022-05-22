@@ -3,6 +3,7 @@
 #define __DISPLAY_H__
 
 #include <Adafruit_SSD1306.h>
+#include "leds.h"
 #include "thunderstorm.h"
 #include "system.h"
 #include "icons.h"
@@ -27,13 +28,13 @@ class Display
 {
 private:
     Thunderstorm *thunderstorm;
+    Leds *leds;
     bool awake = true;
     unsigned long idleSince = 0;
     Adafruit_SSD1306 *oled;
     char buffer[160];
     unsigned long lastScreenRefresh = 0;
     uint8_t mode = 0;
-    bool highBrightness = true;
 
     void printHeader();
     void keepAwake();
@@ -48,11 +49,10 @@ private:
     void write(uint8_t x, uint8_t y);
     
 public:
-    Display(Thunderstorm *thunderstorm);
+    Display(Thunderstorm *thunderstorm, Leds *leds);
     void loop(bool forceRefresh);
     void onClick();
-    void onLongPress();
-    bool isHighBrightnessOn();
+    void onLongPress();    
 };
 
 #endif

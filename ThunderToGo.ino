@@ -15,19 +15,17 @@
 //
 
 #include <Wire.h>
-#include <FastLED.h>
 
-#define LEDS_COUNT 2
 #define PIN_BUTTON 7
 #define PIN_THUNDER_IRQ 0
 
+#include "leds.h"
 #include "display.h"
 #include "thunderstorm.h"
 
+Leds *leds;
 Display *display;
 Thunderstorm *thunderstorm;
-
-CRGB led[LEDS_COUNT];
 
 bool buttonInterrupt = false;
 bool thunderInterrupt = false;
@@ -47,50 +45,14 @@ void setup()
     Wire.begin();
 
     thunderstorm = new Thunderstorm();
-    display = new Display(thunderstorm);
-
-    FastLED.addLeds<WS2812B, 5, GRB>(led, LEDS_COUNT);
-    FastLED.setBrightness(255);
-
-    for (int ix = 0; ix < LEDS_COUNT; ix++)
-    {
-        led[ix] = CRGB::Black;
-    }
+    leds = new Leds(thunderstorm);
+    display = new Display(thunderstorm, leds);
 
     pinMode(PIN_BUTTON, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(PIN_BUTTON), buttonISR, FALLING);
 
     pinMode(PIN_THUNDER_IRQ, INPUT);
     attachInterrupt(digitalPinToInterrupt(PIN_THUNDER_IRQ), thunderISR, RISING);
-}
-
-void lightningShow()
-{
-    byte previousBrightness = FastLED.getBrightness();
-
-    for (int ix = 0; ix < LEDS_COUNT; ix++)
-    {
-        led[ix] = CRGB::White;
-    }
-
-    for (int l = 0; l < random(4, 12); l++)
-    {
-        FastLED.setBrightness(random(20, 255));
-        FastLED.show();
-        delay(random(1, 50));
-
-        FastLED.setBrightness(0);
-        FastLED.show();
-        delay(random(1, 150));
-    }
-
-    FastLED.setBrightness(previousBrightness);
-
-    for (int ix = 0; ix < LEDS_COUNT; ix++)
-    {
-        led[ix] = CRGB::Black;
-    }
-    FastLED.show();
 }
 
 void serveButton()
@@ -110,7 +72,7 @@ void serveButton()
     {
         display->onLongPress();
     }
-  
+
     buttonInterrupt = false;
 }
 void loop()
@@ -126,39 +88,11 @@ void loop()
 
         if (thunderstorm->strikeDetected())
         {
-            lightningShow();
+            leds->lightningShow();
         }
     }
 
+    leds->loop();
     thunderstorm->loop();
     display->loop(false);
-
-    uint16_t interval = (thunderstorm->isActive() ? 500 : 2000);
-
-    if (!thunderstorm->isSensorActive())
-    {
-        interval = 500;
-    }
-
-    for (int ix = 0; ix < LEDS_COUNT; ix++)
-    {
-        if (millis() % interval < 100)
-        {
-            if (!thunderstorm->isSensorActive())
-            {
-                led[ix] = CRGB::Blue;
-                continue;
-            }
-
-            led[ix] = thunderstorm->isActive() ? CRGB::Red : CRGB::Green;
-        }
-        else
-        {
-            led[ix] = CRGB::Black;
-        }
-    }
-
-    FastLED.setBrightness(display->isHighBrightnessOn() ? 255 : 40);
-
-    FastLED.show();
 }

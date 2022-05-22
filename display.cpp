@@ -1,8 +1,9 @@
 #include "display.h"
 
-Display::Display(Thunderstorm *thunderstorm)
+Display::Display(Thunderstorm *thunderstorm, Leds *leds)
 {
     this->thunderstorm = thunderstorm;
+    this->leds = leds;
 
     this->oled = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
@@ -89,7 +90,7 @@ void Display::onLongPress()
     switch (this->mode)
     {
     case DISPLAY_MODE_BRIGHTNESS:
-        this->highBrightness = !this->highBrightness;
+        this->leds->highBrightness = !this->leds->highBrightness;
         break;
     case DISPLAY_MODE_INOUTDOOR:
         this->thunderstorm->changeMode();
@@ -220,7 +221,7 @@ void Display::loopBrightness()
     sprintf(this->buffer, "Brightness");
     this->writeCentered(16);
 
-     if (this->isHighBrightnessOn())
+     if (this->leds->highBrightness)
     {
         sprintf(this->buffer, "HIGH");
     }
@@ -274,9 +275,4 @@ void Display::write(uint8_t x, uint8_t y)
 {
     this->oled->setCursor(x, y);
     this->oled->write(this->buffer);
-}
-
-bool Display::isHighBrightnessOn()
-{
-    return this->highBrightness;
 }
