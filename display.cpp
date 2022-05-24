@@ -82,6 +82,11 @@ void Display::onClick()
     {
         this->mode = (this->mode + 1) % DISPLAY_MODES;
         this->lastScreenRefresh = 0;
+
+        if (this->thunderstorm->getTestMode())
+        {
+            this->thunderstorm->setTestMode(false);
+        }
     }
 
     this->keepAwake();
@@ -122,11 +127,6 @@ void Display::printHeader()
     else
     {
         sprintf(this->buffer, "OUTDOOR");
-    }
-
-    if (this->thunderstorm->getTestMode())
-    {
-        sprintf(this->buffer, "! TEST !");
     }
 
     this->write(0, 0);
