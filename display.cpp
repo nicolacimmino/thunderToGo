@@ -99,7 +99,7 @@ void Display::onLongPress()
         this->thunderstorm->changeMode();
         break;
     case DISPLAY_MODE_TEST:
-        this->thunderstorm->testMode = !this->thunderstorm->testMode;
+        this->thunderstorm->setTestMode(!this->thunderstorm->getTestMode());
         break;
     case DISPLAY_MODE_REJECTSPIKES:
         this->thunderstorm->increaseRejectSpikes();
@@ -124,7 +124,7 @@ void Display::printHeader()
         sprintf(this->buffer, "OUTDOOR");
     }
 
-    if (this->thunderstorm->testMode)
+    if (this->thunderstorm->getTestMode())
     {
         sprintf(this->buffer, "! TEST !");
     }
@@ -214,7 +214,7 @@ void Display::loopTestMode()
     sprintf(this->buffer, "Test");
     this->writeCentered(16);
 
-    if (this->thunderstorm->testMode)
+    if (this->thunderstorm->getTestMode())
     {
         sprintf(this->buffer, "ON");
     }

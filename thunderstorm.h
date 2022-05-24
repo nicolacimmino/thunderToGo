@@ -22,11 +22,12 @@ private:
     SparkFun_AS3935 *lightning;
     unsigned long lastSensorEventTime = 0;
     unsigned long lastStrikeTime = 0;
+    bool testMode = false;
+    void clearStorm();
 
 public:
     uint16_t strikes = 0;
     uint8_t distance = 0;
-    bool testMode = false;
 
     Thunderstorm();
     void loop();
@@ -38,6 +39,8 @@ public:
     uint8_t getRejectSpikes();
     void changeMode();
     void increaseRejectSpikes();
+    void setTestMode(bool on);
+    bool getTestMode();
 };
 
 #endif

@@ -5,7 +5,7 @@ Thunderstorm::Thunderstorm()
     this->lightning = new SparkFun_AS3935(AS3935_ADDR);
 
     this->lightning->begin();
-        
+
     this->lightning->maskDisturber(1);
 }
 
@@ -13,14 +13,15 @@ void Thunderstorm::loop()
 {
     if (!this->isActive())
     {
-        this->strikes = 0;
-        this->distance = 0;
-        this->lastStrikeTime = 0;
+        this->clearStorm();
     }
+}
 
-    // Mask disturbers unless we are in test mode where disturbers
-    //  are treated as strikes.
-    this->lightning->maskDisturber(!this->testMode);
+void Thunderstorm::clearStorm()
+{
+    this->strikes = 0;
+    this->distance = 0;
+    this->lastStrikeTime = 0;
 }
 
 bool Thunderstorm::strikeDetected()
@@ -39,7 +40,7 @@ bool Thunderstorm::strikeDetected()
         return true;
     }
 
-    // In test mode threat disturbers as strikes.
+    // In test mode treat disturbers as strikes.
     if (this->testMode && interruptVector == DISTURBER_INT)
     {
         this->strikes++;
@@ -93,4 +94,20 @@ void Thunderstorm::changeMode()
 void Thunderstorm::increaseRejectSpikes()
 {
     this->lightning->spikeRejection(max(1, (this->getRejectSpikes() + 1) % MAX_SPIKE_REJECT));
+}
+
+void Thunderstorm::setTestMode(bool on)
+{
+    this->testMode = on;
+
+    // Mask disturbers unless we are in test mode where disturbers
+    //  are treated as strikes.
+    this->lightning->maskDisturber(!this->testMode);
+
+    this->clearStorm();
+}
+
+bool Thunderstorm::getTestMode()
+{
+    return this->testMode;
 }
