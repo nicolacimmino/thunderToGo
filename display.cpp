@@ -27,6 +27,11 @@ void Display::loop(bool forceRefresh)
         this->oled->ssd1306_command(SSD1306_DISPLAYOFF);
         this->awake = false;
 
+        if (!this->thunderstorm->getTestMode())
+        {
+            this->mode = DISPLAY_MODE_MAIN;
+        }
+
         return;
     }
 
