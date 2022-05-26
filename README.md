@@ -1,4 +1,4 @@
-# thunderToGo
+# Thunder To Go
 Portable Thunder Detector
 
 A portable device to alert of nearing thunderstorms. Based on the AS3935 sensor.
