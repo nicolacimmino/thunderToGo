@@ -18,6 +18,6 @@ uint8_t getBatteryLevel()
     measuredVcc = 1125300L / (ADCL | (ADCH << 8));
     analogReference(DEFAULT);
 
-    // Max 4360 mV, min 2700 mV => 1660 mV dynamic range
-    return min(max((measuredVcc - 2700) / 16, 0), 100);
+    // Max 3700 mV, min 2500 mV => 1200 mV dynamic range
+    return min(max((measuredVcc - 2500) / 12, 0), 100);
 }
